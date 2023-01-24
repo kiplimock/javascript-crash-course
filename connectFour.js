@@ -45,17 +45,18 @@ function playerTwoWins() {
 }
 
  // function to return indices to check for win
-function range(index, range) {
+function range(index, step, limit) {
     indices = [];
 
     // the furthest chip is never more than 3 chips from
     // the current chip
-    for (let i = -3; i < 4; i++) {
-        indices.push(index + i * range);
+    for (let i = -limit; i <= limit; i++) {
+        indices.push(index + i * step);
     }
 
     // chip indices must be between 1 and 41 inclusive
-    indices = indices.filter(x => x >= 1 && x <= 41);
+    indices = indices.filter(x => x >= 0 && x <= 41);
+    // console.log(indices);
     return [indices.slice(0, 4), indices.slice(-4)];
 }
 
@@ -72,7 +73,7 @@ function checkWin(currentChip) {
     var chips = [];
     for (let i = 0; i < 2; i++) {
         innerArray = [];
-        for (let x of range(index, 7)[i]) {
+        for (let x of range(index, 7, 3)[i]) {
             innerArray.push(td[x].className);
             // console.log(td[x].className);
         }
@@ -102,11 +103,44 @@ function checkHorizontalWin(currentChip) {
     var chips = [];
     for (let i = 0; i < 2; i++) {
         innerArray = [];
-        for (let x of range(index, 1)[i]) {
+        for (let x of range(index, 1, 3)[i]) {
             // chips must be of the same row
             if (td[x].closest("tr").rowIndex === rowIndex) {
                 innerArray.push(td[x].className);
             }
+        }
+        chips.push(innerArray);
+    }
+
+    var blue = chips[0].filter(x => x === "turnBlue").length === 4 || chips[1].filter(x => x === "turnBlue").length === 4;
+    var red = chips[0].filter(x => x === "turnRed").length === 4 || chips[1].filter(x => x === "turnRed").length === 4;
+    // console.log("Blue: " + blue);
+
+    if (blue) {
+        return true;
+    } else if (red) {
+        return true;
+    }
+}
+
+// function to check diagonal win
+function checkDiagonalWin(currentChip) {
+    var index = parseInt(currentChip[0]);
+    console.log("You played chip " + index);
+    
+    var chips = [];
+    for (let i = 0; i < 2; i++) {
+        innerArray = [];
+        // diff = 6
+        for (let x of range(index, 6)[i]) {
+            // chips must be of the same row
+            innerArray.push(td[x]);
+        }
+        chips.push(innerArray);
+        // diff = 8
+        for (let x of range(index, 8, 3)[i]) {
+            // chips must be of the same row
+            innerArray.push(td[x]);
         }
         chips.push(innerArray);
     }
@@ -172,3 +206,14 @@ dropChip();
 
 
 button.addEventListener("click", clearBoard);
+
+// for (let i = 0; i < chips[0].length; i++) {
+//     if (i+1 >= chips[0].length) {
+//         // pass
+//     } else {
+//         if (Math.abs(chips[0][i].cellIndex - chips[0][i+1].cellIndex !== 1)) {
+//             chips[0].splice(chips[0].indexOf(chips[0][i+1]), 1);
+//         }
+//     }
+// }
+// chips[0]
