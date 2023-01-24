@@ -8,6 +8,7 @@ function clearBoard() {
         element.classList.add("turnGray");
     });
     // reset the current player to player one
+    console.clear();
     playerOne();
 }
 
@@ -22,7 +23,6 @@ function signUp() {
         second = prompt("Player two, please enter your name. You will be red.");
     });
 }
-// console.log(first);
 
 // function to switch to player 1
 function playerOne() {
@@ -33,6 +33,16 @@ function playerOne() {
  function playerTwo() {
     $("#player").text(second + ", its your turn to play");
  }
+
+//  function to notify of player 1 winning
+function playerOneWins() {
+    $("#player").text(first + " wins!");
+}
+
+//  function to notify of player 1 winning
+function playerTwoWins() {
+    $("#player").text(second + " wins!");
+}
 
  // function to return indices to check for win
 function range(index, range) {
@@ -57,7 +67,7 @@ function checkWin(currentChip) {
 
     // the chip that was just played
     var index = parseInt(currentChip[0]);
-    console.log("You played chip " + index);
+    // console.log("You played chip " + index);
     
     var chips = [];
     for (let i = 0; i < 2; i++) {
@@ -69,7 +79,6 @@ function checkWin(currentChip) {
         chips.push(innerArray);
     }
 
-    console.log(chips);
     var blue = chips[0].filter(x => x === "turnBlue").length === 4 || chips[1].filter(x => x === "turnBlue").length === 4;
     var red = chips[0].filter(x => x === "turnRed").length === 4 || chips[1].filter(x => x === "turnRed").length === 4;
     // console.log("Blue: " + blue);
@@ -79,11 +88,38 @@ function checkWin(currentChip) {
     } else if (red) {
         return true;
     }
-    // return blue || red;
-
-    // check horizontal win (diff = 1)
 
     // check diagonal win (diff = 6 or 8)
+}
+
+// function to check for horizontal win
+function checkHorizontalWin(currentChip) {
+    // check horizontal win (diff = 1)
+    var index = parseInt(currentChip[0]);
+    var rowIndex = currentChip[1].closest("tr").rowIndex
+    console.log("You played chip " + index);
+    
+    var chips = [];
+    for (let i = 0; i < 2; i++) {
+        innerArray = [];
+        for (let x of range(index, 1)[i]) {
+            // chips must be of the same row
+            if (td[x].closest("tr").rowIndex === rowIndex) {
+                innerArray.push(td[x].className);
+            }
+        }
+        chips.push(innerArray);
+    }
+
+    var blue = chips[0].filter(x => x === "turnBlue").length === 4 || chips[1].filter(x => x === "turnBlue").length === 4;
+    var red = chips[0].filter(x => x === "turnRed").length === 4 || chips[1].filter(x => x === "turnRed").length === 4;
+    // console.log("Blue: " + blue);
+
+    if (blue) {
+        return true;
+    } else if (red) {
+        return true;
+    }
 }
 
 // function to return the css class of the lowest chip in the column
@@ -108,13 +144,19 @@ function dropChip() {
                 if (player === "Player 1") {
                     console.log(lowestChip);
                     $(lowestChip).removeClass("turnGray").addClass("turnBlue");
-                    checkWin(lowestChip);
+                    if (checkWin(lowestChip) || checkHorizontalWin(lowestChip)) {
+                        playerOneWins();
+                        alert("Player one wins!");
+                    }
                     player = "Player 2";
                     playerTwo();
                 } else if (player === "Player 2") {
                     console.log(lowestChip);
                     $(lowestChip).removeClass("turnGray").addClass("turnRed");
-                    checkWin(lowestChip);
+                    if (checkWin(lowestChip) || checkHorizontalWin(lowestChip)) {
+                        playerTwoWins();
+                        alert("Player two wins!");
+                    }
                     player = "Player 1";
                     playerOne();
                 }
