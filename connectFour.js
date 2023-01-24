@@ -46,7 +46,6 @@ function range(index, range) {
 
     // chip indices must be between 1 and 41 inclusive
     indices = indices.filter(x => x >= 1 && x <= 41);
-    console.log([indices.slice(0, 4), indices.slice(-4)])
     return [indices.slice(0, 4), indices.slice(-4)];
 }
 
@@ -57,25 +56,28 @@ function checkWin(currentChip) {
     // 2,9,16,23,30,37
 
     // the chip that was just played
-    var index = currentChip[0];
+    var index = parseInt(currentChip[0]);
     console.log("You played chip " + index);
     
     var chips = [];
     for (let i = 0; i < 2; i++) {
         innerArray = [];
         for (let x of range(index, 7)[i]) {
-            innerArray.push(td[x]);
+            innerArray.push(td[x].className);
+            // console.log(td[x].className);
         }
         chips.push(innerArray);
     }
-    console.log("Chips: " + chips);
-    var blue = chips[0].filter(x => x.className === "turnBlue").length === 4 || chips[1].filter(x => x.className === "turnBlue").length === 4;
-    var red = chips[0].filter(x => x.className === "turnRed").length === 4 || chips[1].filter(x => x.className === "turnRed").length === 4;
-    
+
+    console.log(chips);
+    var blue = chips[0].filter(x => x === "turnBlue").length === 4 || chips[1].filter(x => x === "turnBlue").length === 4;
+    var red = chips[0].filter(x => x === "turnRed").length === 4 || chips[1].filter(x => x === "turnRed").length === 4;
+    // console.log("Blue: " + blue);
+
     if (blue) {
-        console.log("Blue wins");
+        return true;
     } else if (red) {
-        console.log("Red wins");
+        return true;
     }
     // return blue || red;
 
@@ -101,21 +103,18 @@ function dropChip() {
             grayChips = colChips.filter(x => x[1].className === 'turnGray');
             if (grayChips.length >= 1) {
                 var lowestChip = grayChips[grayChips.length - 1];
-                $(lowestChip[1]).removeClass("turnGray");
-                // $(lowestChip).addClass("turnBlue");
-
-                // var nextLowestChip = $(colChips[grayChips.length])[1]
+                // $(lowestChip[1]).removeClass("turnGray");
 
                 if (player === "Player 1") {
                     console.log(lowestChip);
+                    $(lowestChip).removeClass("turnGray").addClass("turnBlue");
                     checkWin(lowestChip);
-                    $(lowestChip).addClass("turnBlue");
                     player = "Player 2";
                     playerTwo();
                 } else if (player === "Player 2") {
                     console.log(lowestChip);
+                    $(lowestChip).removeClass("turnGray").addClass("turnRed");
                     checkWin(lowestChip);
-                    $(lowestChip).addClass("turnRed");
                     player = "Player 1";
                     playerOne();
                 }
