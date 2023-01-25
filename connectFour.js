@@ -61,7 +61,7 @@ function range(index, step, limit) {
 }
 
 // function to check for winning combinations
-function checkWin(currentChip) {
+function checkVerticalWin(currentChip) {
 
     // check vertial win (diff = 7)
     // 2,9,16,23,30,37
@@ -98,7 +98,7 @@ function checkHorizontalWin(currentChip) {
     // check horizontal win (diff = 1)
     var index = parseInt(currentChip[0]);
     var rowIndex = currentChip[1].closest("tr").rowIndex
-    console.log("You played chip " + index);
+    // console.log("You played chip " + index);
     
     var chips = [];
     for (let i = 0; i < 2; i++) {
@@ -126,7 +126,7 @@ function checkHorizontalWin(currentChip) {
 // function to check diagonal win
 function checkDiagonalWin(currentChip) {
     var index = parseInt(currentChip[0]);
-    console.log("You played chip " + index);
+    // console.log("You played chip " + index);
     
     var chips = [];
     // create all possible combinations of winning diagonal chips
@@ -136,7 +136,6 @@ function checkDiagonalWin(currentChip) {
         // diff = 6
         innerArray = [];
         for (let x of range(index, 6, 5)[i]) {
-            // chips must be of the same row
             innerArray.push(td[x]);
         }
         chips.push(innerArray);
@@ -144,31 +143,51 @@ function checkDiagonalWin(currentChip) {
         // diff = 8
         innerArray = [];
         for (let x of range(index, 8, 5)[i]) {
-            // chips must be of the same row
             innerArray.push(td[x]);
         }
         chips.push(innerArray);
     }
 
+    var partOne = chips[0].concat(chips[2]);
+    var partTwo = chips[1].concat(chips[3]);
+    partOne = Array.from(new Set(partOne));
+    partTwo = Array.from(new Set(partTwo));
+    chips = [partOne, partTwo];
+
     // remove those chips that don't fit the 
     // mathematical criteria
     chips.forEach(item => {
-        item.forEach((element, index, Array) => {
+        item.forEach((element, index, array) => {
             if (index+1 < item.length) {
-                if (Math.abs(item[index].cellIndex - item[index+1].cellIndex) !== 1) {
+                // diagonal elements must belong to adjacent columns
+                if (Math.abs(element.cellIndex - array[index+1].cellIndex) !== 1) {
                     item.splice(index+1, 3);
                 }
             }
         });
     });
 
-    var blue = chips[0].filter(x => x === "turnBlue").length === 4 || chips[1].filter(x => x === "turnBlue").length === 4;
-    var red = chips[0].filter(x => x === "turnRed").length === 4 || chips[1].filter(x => x === "turnRed").length === 4;
-    // console.log("Blue: " + blue);
+    newChips = [];
+    chips.forEach(item => {
+        newChips.push(item.slice(0, 4), item.slice(-4));
+    });
 
-    if (blue) {
-        return true;
-    } else if (red) {
+    chips = newChips
+
+    var color = [];
+    // check there is at least one combination that wins the game
+    chips.forEach(item => {
+        blue = item.filter(x => x.className === "turnBlue").length === 4;
+        red = item.filter(x => x.className === "turnRed").length === 4;
+
+        if (blue) {
+            color.push("blue");
+        } else if (red) {
+            color.push("red");
+        }
+    });
+
+    if (color.includes("blue") || color.includes("red")) {
         return true;
     }
 }
@@ -195,18 +214,18 @@ function dropChip() {
                 if (player === "Player 1") {
                     console.log(lowestChip);
                     $(lowestChip).removeClass("turnGray").addClass("turnBlue");
-                    if (checkWin(lowestChip) || checkHorizontalWin(lowestChip)) {
+                    if (checkVerticalWin(lowestChip) || checkHorizontalWin(lowestChip) || checkDiagonalWin(lowestChip)) {
                         playerOneWins();
-                        alert("Player one wins!");
+                        alert(player + " wins");
                     }
                     player = "Player 2";
                     playerTwo();
                 } else if (player === "Player 2") {
                     console.log(lowestChip);
                     $(lowestChip).removeClass("turnGray").addClass("turnRed");
-                    if (checkWin(lowestChip) || checkHorizontalWin(lowestChip)) {
+                    if (checkVerticalWin(lowestChip) || checkHorizontalWin(lowestChip) || checkDiagonalWin(lowestChip)) {
                         playerTwoWins();
-                        alert("Player two wins!");
+                        alert(player + " wins");
                     }
                     player = "Player 1";
                     playerOne();
@@ -221,16 +240,4 @@ function dropChip() {
 
 dropChip();
 
-
 button.addEventListener("click", clearBoard);
-
-// for (let i = 0; i < chips[0].length; i++) {
-//     if (i+1 >= chips[0].length) {
-//         // pass
-//     } else {
-//         if (Math.abs(chips[0][i].cellIndex - chips[0][i+1].cellIndex !== 1)) {
-//             chips[0].splice(chips[0].indexOf(chips[0][i+1]), 1);
-//         }
-//     }
-// }
-// chips[0]
