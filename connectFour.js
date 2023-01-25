@@ -129,21 +129,38 @@ function checkDiagonalWin(currentChip) {
     console.log("You played chip " + index);
     
     var chips = [];
+    // create all possible combinations of winning diagonal chips
+    // from the chip just played
     for (let i = 0; i < 2; i++) {
-        innerArray = [];
+
         // diff = 6
-        for (let x of range(index, 6)[i]) {
+        innerArray = [];
+        for (let x of range(index, 6, 5)[i]) {
             // chips must be of the same row
             innerArray.push(td[x]);
         }
         chips.push(innerArray);
+
         // diff = 8
-        for (let x of range(index, 8, 3)[i]) {
+        innerArray = [];
+        for (let x of range(index, 8, 5)[i]) {
             // chips must be of the same row
             innerArray.push(td[x]);
         }
         chips.push(innerArray);
     }
+
+    // remove those chips that don't fit the 
+    // mathematical criteria
+    chips.forEach(item => {
+        item.forEach((element, index, Array) => {
+            if (index+1 < item.length) {
+                if (Math.abs(item[index].cellIndex - item[index+1].cellIndex) !== 1) {
+                    item.splice(index+1, 3);
+                }
+            }
+        });
+    });
 
     var blue = chips[0].filter(x => x === "turnBlue").length === 4 || chips[1].filter(x => x === "turnBlue").length === 4;
     var red = chips[0].filter(x => x === "turnRed").length === 4 || chips[1].filter(x => x === "turnRed").length === 4;
