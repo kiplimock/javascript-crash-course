@@ -214,21 +214,21 @@ function dropChip() {
                 if (player === "Player 1") {
                     console.log(lowestChip);
                     $(lowestChip).removeClass("turnGray").addClass("turnBlue");
-                    if (checkVerticalWin(lowestChip) || checkHorizontalWin(lowestChip) || checkDiagonalWin(lowestChip)) {
-                        playerOneWins();
-                        alert(player + " wins");
-                    }
                     player = "Player 2";
                     playerTwo();
+                    if (checkVerticalWin(lowestChip) || checkHorizontalWin(lowestChip) || checkDiagonalWin(lowestChip)) {
+                        playerOneWins();
+                        alert(player + " wins. Refresh your browser to play again!");
+                    }
                 } else if (player === "Player 2") {
                     console.log(lowestChip);
                     $(lowestChip).removeClass("turnGray").addClass("turnRed");
-                    if (checkVerticalWin(lowestChip) || checkHorizontalWin(lowestChip) || checkDiagonalWin(lowestChip)) {
-                        playerTwoWins();
-                        alert(player + " wins");
-                    }
                     player = "Player 1";
                     playerOne();
+                    if (checkVerticalWin(lowestChip) || checkHorizontalWin(lowestChip) || checkDiagonalWin(lowestChip)) {
+                        playerTwoWins();
+                        alert(player + " wins. Refresh your browser to play again!");
+                    }
                 }
             }
             else {
